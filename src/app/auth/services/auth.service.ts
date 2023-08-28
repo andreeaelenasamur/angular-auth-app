@@ -34,7 +34,6 @@ export class AuthService {
           this._authStatus.set(AuthStatus.authenticated);
           localStorage.setItem('token', token);
 
-          console.log({user, token});
         }),
 
         map( () => true ),
