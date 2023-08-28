@@ -4,11 +4,14 @@ import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
 import { environment } from 'src/environments/environments';
 import { AuthStatus, CheckTokenResponse, LoginResponse, User } from '../interfaces';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+
+  private router = inject(Router)
 
   private readonly baseUrl: string = environment.baseUrl;
   private http = inject(HttpClient);
@@ -50,7 +53,10 @@ export class AuthService {
     const url = `${this.baseUrl}/auth/check-token`;
     const token = localStorage.getItem('token');
 
-    if( !token ) return of (false);
+    if( !token ) {
+      this.logout();
+      return of (false)
+    };
 
     const headers = new HttpHeaders()
     .set('Authorization', `Bearer ${token}`);
@@ -64,6 +70,12 @@ export class AuthService {
 
       })
     )
+  }
+
+  logout() {
+    localStorage.clear();
+    this._authStatus.set(AuthStatus.notAuthenticated)
+    this.router.navigateByUrl('/auth/login');
   }
 
 }
